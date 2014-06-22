@@ -1,13 +1,14 @@
 class IBLT
+  require 'ciblt'
  
   def initialize(opts = {})
     @opts = {
       :size    => 100,
       :hashes  => 4,
-      :seed    => Time.now.to_i,
+      :seed    => Time.now.to_i
     }.merge(opts)
 
-    @iblt = CIBLT.new(@opts[:size], @opts[:hashes], @opts[:seed]))
+    @iblt = CIBLT.new(@opts[:size], @opts[:hashes], @opts[:seed])
   end
 
   # This method inserts a key-value pair into the IBLT. This operation always
@@ -29,10 +30,11 @@ class IBLT
     @iblt.[](key)
   end
 
-  # This methods returns all key-value pairs as a string
-  def inspect()
-    @iblt.inspect()
+  # This methods returns all key-value pairs as a string and destroys the data
+  # in the process
+  def inspect!()
+    @iblt.inspect!()
   end
-  alias :to_s :inspect
+  alias :to_s! :inspect!
 
 end
