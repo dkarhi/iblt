@@ -27,7 +27,7 @@ iblt = IBLT.new
 You can define the total size of the IBLT, the number of hash functions, and the seed value, if you want (The defaults are :size => 100, :hashes => 4, :seed => Time.now.to_i):
 
 ```ruby
-iblt = IBTL.new(:size => 1000, :hashes => 6, :seed => 12345)
+iblt = IBLT.new(:size => 1000, :hashes => 6, :seed => 12345)
 ```
 
 Insert items into the IBLT:
