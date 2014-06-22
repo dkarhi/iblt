@@ -44,7 +44,7 @@ iblt[1] # => 1
 iblt[2] # => 2
 ```
 
-Delete and item from the IBLT and verify deletion:
+Delete an item from the IBLT and verify deletion:
 
 ```ruby
 iblt.delete(1,1) # => nil
