@@ -10,4 +10,5 @@ Gem::Specification.new do |s|
   s.license = 'MIT'
   s.date = "2014-06-20"
   s.files = `git ls-files`.split("\n")
+  s.extensions = ["ext/ciblt/extconf.rb"]
 end
