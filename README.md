@@ -10,7 +10,7 @@ An IBLT is a variation of a Bloom filter that includes the following methods:
 
 - insert(key, value): Insert the key-value pair into the IBLT. This method is always successful if all keys are distinct and returns nil.
 - delete(key, value): Remove the key-value pair from the IBLT. This method is always successful if the item exists in the IBLT and returns nil. No checking is done, so DO NOT delete an item unless it is definitely in the IBLT. 
-- [](key): Returns the value for the given key or nil if not found. This method will sometimes return nil even though the item has been inserted, which is a property of IBLTs.
+- \[\](key): Returns the value for the given key or nil if not found. This method will sometimes return nil even though the item has been inserted, which is a property of IBLTs.
 - inspect!(): Returns a string of all key-value pairs that have been inserted into the IBLT. This method will sometimes fail to return all key-value pairs that have been inserted, which is a property of IBLTs. This method also destroys the data.  
 
 For this particular implementation, both the key and value must be integers. Also, a separate array is created for each hash function so that hashes yield distinct locations. Each array is of size m/k where m is the total size and k is the number of hash functions used. Instead of k distinct hash functions, we use k number of runs of CRC32 with a slightly different seed (incrementing the seed by 1).  
