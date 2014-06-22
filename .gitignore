@@ -1,0 +1,4 @@
+*.o
+*.gem
+ext/ciblt/Makefile
+ext/ciblt/ciblt.so
