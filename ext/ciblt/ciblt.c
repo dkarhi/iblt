@@ -40,10 +40,6 @@ int bit_xor(int x, int y) {
     return z;
 }
 
-//char bit_xor(char *x, char *y) {
-//    
-//}
-
 static VALUE iblt_s_new(int argc, VALUE *argv, VALUE self) {
     struct IBLT *iblt;
     VALUE obj;
@@ -66,7 +62,6 @@ static VALUE iblt_s_new(int argc, VALUE *argv, VALUE self) {
             iblt->ptr[i][j].value_sum = 0;
         }
     }
-    rb_iv_set(obj, "@hash_value", rb_hash_new());
     return obj;
 }
 
