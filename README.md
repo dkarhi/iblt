@@ -70,6 +70,8 @@ iblt.inspect! # => "{}"
 - Accept strings as values for key-value pair instead of integers
 - Implement non-destructive inspect method (by making copy of data to inspect)
 - Implement as linked list instead of multidimensional array for better time performance
+- Improve error handling
+- Write RSpec tests
 
 ## Credits
 
