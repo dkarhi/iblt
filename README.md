@@ -64,12 +64,13 @@ iblt.inspect! # => "{}"
 ## Bugs
 
 - There are occasional Segmentation Faults on insert
+- The inspect method is improperly implemented at the moment, so not all elements that can be returned are
 
 ## TODO
 
 - Accept strings as values for key-value pair instead of integers
 - Implement non-destructive inspect method (by making copy of data to inspect)
-- Implement as linked list instead of multidimensional array for better time performance
+- Implement a link-list-based priority queue to improve time performance of the inspect method
 - Improve error handling
 - Write RSpec tests
 
