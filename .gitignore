@@ -2,3 +2,6 @@
 *.gem
 ext/ciblt/Makefile
 ext/ciblt/ciblt.so
+lib/ciblt.so
+Gemfile.lock
+tmp
