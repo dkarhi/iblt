@@ -13,7 +13,7 @@ An IBLT is a variation of a Bloom filter that includes the following methods:
 - \[\](key): Returns the value for the given key or nil if not found. This method will sometimes return nil even though the item has been inserted, which is a property of IBLTs.
 - inspect!(): Returns a string of all key-value pairs that have been inserted into the IBLT. This method will sometimes fail to return all key-value pairs that have been inserted, which is a property of IBLTs. This method also destroys the data.  
 
-For this particular implementation, both the key and value must be integers. Also, a separate array is created for each hash function so that hashes yield distinct locations. Each array is of size m/k where m is the total size and k is the number of hash functions used. Instead of k distinct hash functions, we use k number of runs of CRC32 with a slightly different seed (incrementing the seed by 1).  
+For this particular implementation, both the key and value must be strings. Also, a separate array is created for each hash function so that hashes yield distinct locations. Each array is of size m/k where m is the total size and k is the number of hash functions used. Instead of k distinct hash functions, we use k number of runs of CRC32 with a slightly different seed (incrementing the seed by 1).  
 
 ## Usage
 
@@ -33,42 +33,40 @@ iblt = IBLT.new(:size => 1000, :hashes => 6, :seed => 12345)
 Insert items into the IBLT:
 
 ```ruby
-iblt.insert(1,1) # => nil
-iblt.insert(2,2) # => nil
+iblt.insert("key1","value1") # => nil
+iblt.insert("key2","value2") # => nil
 ```
 
 Get items from the IBLT:
 
 ```ruby
-iblt[1] # => 1
-iblt[2] # => 2
+iblt["key1"] # => "value1"
+iblt["key2"] # => "value2"
 ```
 
 Delete an item from the IBLT and verify deletion:
 
 ```ruby
-iblt.delete(1,1) # => nil
-iblt[1] # => nil
+iblt.delete("key1","value1") # => nil
+iblt["key1"] # => nil
 ```
 
 List out contents of IBLT (WARNING: This destroys the data!):
 
 ```ruby
-iblt.insert(3,3) # => nil
-iblt.inspect! # => "{2=>2, 3=>3}"
-iblt[2] # => nil
-iblt[3] # => nil
+iblt.insert("key3","value3") # => nil
+iblt.inspect! # => "{key2=>value2, key3=>value3}"
+iblt["key2"] # => nil
+iblt["key3"] # => nil
 iblt.inspect! # => "{}"
 ```
 
 ## Bugs
 
 - There are occasional Segmentation Faults on insert
-- The inspect method is improperly implemented at the moment, so not all elements that can be returned are
 
 ## TODO
 
-- Accept strings as values for key-value pair instead of integers
 - Implement non-destructive inspect method (by making copy of data to inspect)
 - Implement a link-list-based priority queue to improve time performance of the inspect method
 - Improve error handling
