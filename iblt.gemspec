@@ -11,8 +11,10 @@ Gem::Specification.new do |s|
   s.date = "2014-06-28"
   s.files = `git ls-files`.split("\n")
   s.extensions = ["ext/ciblt/extconf.rb"]
+  s.require_paths = ["lib"]  
 
-  s.add_development_dependency 'rspec'
+  s.add_development_dependency "rspec"
   s.add_development_dependency "rake"
   s.add_development_dependency "rake-compiler"
+  s.test_files = `git ls-files -- {spec}/*`.split("\n")
 end
