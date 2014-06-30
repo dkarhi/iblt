@@ -182,7 +182,7 @@ static VALUE iblt_get(VALUE self, VALUE key) {
             return Qnil;
         }
         else if (iblt->ptr[i][index].count == 1) {
-            if (strcmp(iblt->ptr[i][index].key_sum, RSTRING_PTR(key)) == 0) {
+            if (strncmp(iblt->ptr[i][index].key_sum, RSTRING_PTR(key), RSTRING_LEN(key)) == 0) {
                 return rb_str_new(iblt->ptr[i][index].value_sum, iblt->ptr[i][index].value_len);
             }
             else {
