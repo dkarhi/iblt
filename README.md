@@ -61,16 +61,11 @@ iblt["key3"] # => nil
 iblt.inspect! # => "{}"
 ```
 
-## Bugs
-
-- There are occasional Segmentation Faults on insert
-
 ## TODO
 
 - Implement non-destructive inspect method (by making copy of data to inspect)
 - Implement a link-list-based priority queue to improve time performance of the inspect method
 - Improve error handling
-- Write RSpec tests
 
 ## Credits
 
