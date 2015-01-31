@@ -63,6 +63,7 @@ iblt.inspect! # => "{}"
 
 ## TODO
 
+- The delete method doesn't always work correctly and needs to be refactored
 - Implement non-destructive inspect method (by making copy of data to inspect)
 - Implement a link-list-based priority queue to improve time performance of the inspect method
 - Improve error handling
