@@ -14,12 +14,19 @@
 
 static VALUE cIBLT;
 
+typedef struct Node {
+    int data;
+    struct Node *next;
+} Node;
+
 typedef struct Cell {
     int count;
     char *key_sum;
     char *value_sum;
-    int key_len; // XOR may put NULLS in sums, so track length
-    int value_len; // XOR may put NULLS in sums, so track length
+    Node *key_lengths;
+    Node *value_lengths; 
+    int key_sum_len; // XOR may put NULLS in sums, so track length
+    int value_sum_len; // XOR may put NULLS in sums, so track length
 } Cell;
 
 struct IBLT {
@@ -76,6 +83,41 @@ char *bit_xor(char *x, char *y, int len_x, int len_y) {
     return xor_result;
 }
 
+// Insert data at the beginning of the list
+void list_push(Node **head, int data) {
+    Node *new_node;
+    new_node = malloc(sizeof(Node));
+
+    new_node->data = data;
+    new_node->next = *head;
+    *head = new_node;
+}
+
+// Remove the first instance of data from the given list
+int list_remove_by_value(Node **head, int data) {
+    Node* current_node = *head;
+    Node* previous_node = NULL;
+
+    if ((*head)->data == data) {
+      current_node = (*head)->next;
+      free(*head);
+      *head = current_node;
+      return 0;
+    }
+    else {
+        while (current_node != NULL) {
+            if ( current_node->data == data ) {
+                previous_node->next = current_node->next;
+                free(current_node);
+                return 0;
+            }
+            previous_node = current_node;
+            current_node = current_node->next;
+        }
+    }
+    return 1;
+}
+
 static VALUE iblt_s_new(int argc, VALUE *argv, VALUE self) {
     struct IBLT *iblt;
     VALUE obj;
@@ -95,9 +137,11 @@ static VALUE iblt_s_new(int argc, VALUE *argv, VALUE self) {
         for (j = 0; j < (int) (iblt->size/iblt->hashes); j++) {
             iblt->ptr[i][j].count = 0;
             iblt->ptr[i][j].key_sum = NULL;
-            iblt->ptr[i][j].key_len = 0;
+            iblt->ptr[i][j].key_sum_len = 0;
             iblt->ptr[i][j].value_sum = NULL;
-            iblt->ptr[i][j].value_len = 0;
+            iblt->ptr[i][j].value_sum_len = 0;
+            iblt->ptr[i][j].value_lengths = NULL;
+            iblt->ptr[i][j].key_lengths = NULL;
         }
     }
     return obj;
@@ -117,18 +161,21 @@ static VALUE iblt_insert(VALUE self, VALUE key, VALUE value) {
 
         index = (int) (crc32((unsigned int) (seed), RSTRING_PTR(key), RSTRING_LEN(key)) % (int) (iblt->size/iblt->hashes));    
         iblt->ptr[i][index].count++;
-        xor_string = bit_xor(iblt->ptr[i][index].key_sum, RSTRING_PTR(key), iblt->ptr[i][index].key_len, RSTRING_LEN(key));
+        xor_string = bit_xor(iblt->ptr[i][index].key_sum, RSTRING_PTR(key), iblt->ptr[i][index].key_sum_len, RSTRING_LEN(key));
         ruby_xfree(iblt->ptr[i][index].key_sum);
         iblt->ptr[i][index].key_sum = xor_string;
-        xor_string = bit_xor(iblt->ptr[i][index].value_sum, RSTRING_PTR(value), iblt->ptr[i][index].value_len, RSTRING_LEN(value));
+        xor_string = bit_xor(iblt->ptr[i][index].value_sum, RSTRING_PTR(value), iblt->ptr[i][index].value_sum_len, RSTRING_LEN(value));
         ruby_xfree(iblt->ptr[i][index].value_sum);
-        iblt->ptr[i][index].value_sum = xor_string; 
- 
-        if (iblt->ptr[i][index].key_len < RSTRING_LEN(key)) {
-            iblt->ptr[i][index].key_len = RSTRING_LEN(key);
+        iblt->ptr[i][index].value_sum = xor_string;  
+
+        list_push(&iblt->ptr[i][index].key_lengths, RSTRING_LEN(key));
+        list_push(&iblt->ptr[i][index].value_lengths, RSTRING_LEN(value));
+
+        if (iblt->ptr[i][index].key_sum_len < RSTRING_LEN(key)) {
+            iblt->ptr[i][index].key_sum_len = RSTRING_LEN(key);
         }
-        if (iblt->ptr[i][index].value_len < RSTRING_LEN(value)) {
-            iblt->ptr[i][index].value_len = RSTRING_LEN(value);
+        if (iblt->ptr[i][index].value_sum_len < RSTRING_LEN(value)) {
+            iblt->ptr[i][index].value_sum_len = RSTRING_LEN(value);
         }
     }
     return Qnil;
@@ -148,12 +195,15 @@ static VALUE iblt_delete(VALUE self, VALUE key, VALUE value) {
 
         index = (int) (crc32((unsigned int) (seed), RSTRING_PTR(key), RSTRING_LEN(key)) % (int) (iblt->size/iblt->hashes));
         iblt->ptr[i][index].count--;
-        xor_string = bit_xor(iblt->ptr[i][index].key_sum, RSTRING_PTR(key), iblt->ptr[i][index].key_len, RSTRING_LEN(key));
+        xor_string = bit_xor(iblt->ptr[i][index].key_sum, RSTRING_PTR(key), iblt->ptr[i][index].key_sum_len, RSTRING_LEN(key));
         ruby_xfree(iblt->ptr[i][index].key_sum);
         iblt->ptr[i][index].key_sum = xor_string;
-        xor_string = bit_xor(iblt->ptr[i][index].value_sum, RSTRING_PTR(value), iblt->ptr[i][index].value_len, RSTRING_LEN(value));
+        xor_string = bit_xor(iblt->ptr[i][index].value_sum, RSTRING_PTR(value), iblt->ptr[i][index].value_sum_len, RSTRING_LEN(value));
         ruby_xfree(iblt->ptr[i][index].value_sum);
         iblt->ptr[i][index].value_sum = xor_string;
+      
+        list_remove_by_value(&iblt->ptr[i][index].key_lengths, RSTRING_LEN(key));
+        list_remove_by_value(&iblt->ptr[i][index].value_lengths, RSTRING_LEN(value));
     }
     return Qnil;
 
@@ -175,7 +225,7 @@ static VALUE iblt_get(VALUE self, VALUE key) {
         }
         else if (iblt->ptr[i][index].count == 1) {
             if (strncmp(iblt->ptr[i][index].key_sum, RSTRING_PTR(key), RSTRING_LEN(key)) == 0) {
-                return rb_str_new(iblt->ptr[i][index].value_sum, iblt->ptr[i][index].value_len);
+                return rb_str_new(iblt->ptr[i][index].value_sum, iblt->ptr[i][index].value_lengths->data);
             }
             else {
                 return Qnil;
@@ -209,13 +259,13 @@ static VALUE iblt_inspect_destroy(VALUE self) {
                        rb_str_buf_cat2(str, ", ");
                    }
                    rb_str_buf_cat2(str, "\"");
-                   rb_str_buf_append(str, rb_str_new(iblt->ptr[i][j].key_sum, iblt->ptr[i][j].key_len));
+                   rb_str_buf_append(str, rb_str_new(iblt->ptr[i][j].key_sum, iblt->ptr[i][j].key_lengths->data));
                    rb_str_buf_cat2(str, "\"");
                    rb_str_buf_cat2(str, "=>");
                    rb_str_buf_cat2(str, "\"");
-                   rb_str_buf_append(str, rb_str_new(iblt->ptr[i][j].value_sum, iblt->ptr[i][j].value_len));
+                   rb_str_buf_append(str, rb_str_new(iblt->ptr[i][j].value_sum, iblt->ptr[i][j].value_lengths->data));
                    rb_str_buf_cat2(str, "\"");
-                   iblt_delete(self, rb_str_new(iblt->ptr[i][j].key_sum, iblt->ptr[i][j].key_len), rb_str_new(iblt->ptr[i][j].value_sum, iblt->ptr[i][j].value_len));
+                   iblt_delete(self, rb_str_new(iblt->ptr[i][j].key_sum, iblt->ptr[i][j].key_lengths->data), rb_str_new(iblt->ptr[i][j].value_sum, iblt->ptr[i][j].value_lengths->data));
                 }
             }
         }
@@ -233,4 +283,3 @@ void Init_ciblt(void) {
     rb_define_method(cIBLT, "[]", iblt_get, 1);
     rb_define_method(cIBLT, "inspect!", iblt_inspect_destroy, 0);
 }
-

@@ -66,13 +66,16 @@ iblt.inspect! # => "{}"
 - Implement non-destructive inspect method (by making copy of data to inspect)
 - Implement a link-list-based priority queue to improve time performance of the inspect method
 - Improve error handling
+- Performance testing and benchmarking
 
 ## Changelog
 
 ### 0.3.0
 
 - The character arrays that hold the key and value data aren't shrunk after calling delete. Any number of null characters may have been introduced by the XOR function. After removing one element, we can't determine how much of the array is valuable data vs padding.  
+- Store key and value lengths in linked lists. This is to mitigate problems when inputting data that contains null characters.
 - Add escaped quotes around key and value in inspect output.
+
 
 ## Credits
 
