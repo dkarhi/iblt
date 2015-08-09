@@ -69,7 +69,7 @@ iblt.inspect! # => "{}"
 
 ## Changelog
 
-# 0.3.0
+### 0.3.0
 
 - The character arrays that hold the key and value data aren't shrunk after calling delete. Any number of null characters may have been introduced by the XOR function. After removing one element, we can't determine how much of the array is valuable data vs padding.  
 - Add escaped quotes around key and value in inspect output.
