@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = "iblt"
-  s.version = "0.2.0"
+  s.version = "0.3.0"
   
   s.authors = ["David Karhi"]
   s.email = 'dkarhi@gmail.com'

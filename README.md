@@ -55,7 +55,7 @@ List out contents of IBLT (WARNING: This destroys the data!):
 
 ```ruby
 iblt.insert("key3","value3") # => nil
-iblt.inspect! # => "{key2=>value2, key3=>value3}"
+iblt.inspect! # => "{\"key2\"=>\"value2\", \"key3\"=>\"value3\"}"
 iblt["key2"] # => nil
 iblt["key3"] # => nil
 iblt.inspect! # => "{}"
@@ -63,10 +63,16 @@ iblt.inspect! # => "{}"
 
 ## TODO
 
-- The delete method doesn't always work correctly and needs to be refactored
 - Implement non-destructive inspect method (by making copy of data to inspect)
 - Implement a link-list-based priority queue to improve time performance of the inspect method
 - Improve error handling
+
+## Changelog
+
+# 0.3.0
+
+- The character arrays that hold the key and value data aren't shrunk after calling delete. Any number of null characters may have been introduced by the XOR function. After removing one element, we can't determine how much of the array is valuable data vs padding.  
+- Add escaped quotes around key and value in inspect output.
 
 ## Credits
 
