@@ -154,14 +154,6 @@ static VALUE iblt_delete(VALUE self, VALUE key, VALUE value) {
         xor_string = bit_xor(iblt->ptr[i][index].value_sum, RSTRING_PTR(value), iblt->ptr[i][index].value_len, RSTRING_LEN(value));
         ruby_xfree(iblt->ptr[i][index].value_sum);
         iblt->ptr[i][index].value_sum = xor_string;
-
-        if (iblt->ptr[i][index].key_len < RSTRING_LEN(key)) {
-            iblt->ptr[i][index].key_len = RSTRING_LEN(key);
-        }
-        if (iblt->ptr[i][index].value_len < RSTRING_LEN(value)) {
-            iblt->ptr[i][index].value_len = RSTRING_LEN(value);
-        }
-
     }
     return Qnil;
 
@@ -216,9 +208,13 @@ static VALUE iblt_inspect_destroy(VALUE self) {
                    if (RSTRING_LEN(str) > 1) { 
                        rb_str_buf_cat2(str, ", ");
                    }
+                   rb_str_buf_cat2(str, "\"");
                    rb_str_buf_append(str, rb_str_new(iblt->ptr[i][j].key_sum, iblt->ptr[i][j].key_len));
+                   rb_str_buf_cat2(str, "\"");
                    rb_str_buf_cat2(str, "=>");
+                   rb_str_buf_cat2(str, "\"");
                    rb_str_buf_append(str, rb_str_new(iblt->ptr[i][j].value_sum, iblt->ptr[i][j].value_len));
+                   rb_str_buf_cat2(str, "\"");
                    iblt_delete(self, rb_str_new(iblt->ptr[i][j].key_sum, iblt->ptr[i][j].key_len), rb_str_new(iblt->ptr[i][j].value_sum, iblt->ptr[i][j].value_len));
                 }
             }
